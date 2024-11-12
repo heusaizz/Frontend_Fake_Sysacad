@@ -1,0 +1,12 @@
+.logout-button {
+    background-color: #ff4d4d; /* Color de fondo rojo */
+    color: white; /* Color del texto */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 10px 15px; /* Espaciado interno */
+    cursor: pointer; /* Cambia el cursor al pasar el mouse */
+}
+
+.logout-button:hover {
+    background-color: #ff1a1a; /* Color de fondo más oscuro al pasar el mouse */
+}
