@@ -1,240 +1,291 @@
-import { useState, useEffect } from "react";
-import useEnrollment from "../hooks/useEnrollment"; // Importa el custom hook
-import {
-  fetchEnrollmentsByClientId,
-  updateUser,
-  fetchAllSubjects,
-  createEnrollment,
-  deleteEnrollment,
-} from "../services/api"; // Importar las funciones necesarias
+import { useState, useEffect } from 'react';
+import { fetchAllSubjects, createEnrollment, fetchEnrollmentsByClientId, deleteEnrollment, fetchAllUsers, updateUser} from '../services/api'; 
 import "./ClientDashboard.css";
 
 const ClientDashboard = () => {
-  const [clientId, setClientId] = useState(""); // Estado para el ID del cliente
-  const [clientData, setClientData] = useState({
-    id: "",
-    name: "",
-    username: "",
-    email: "",
-    password: "",
-    role: "",
-  }); // Estado para los datos del cliente
-  const { enrollments, error, getEnrollments } = useEnrollment(); // Usa el custom hook
-  const [subjects, setSubjects] = useState([]); // Estado para las asignaturas
-  const [enrollmentData, setEnrollmentData] = useState({
-    enrollmentId: "",
-    subjectId: "",
-    clientId: "",
-  });
+    const [clientId, setClientId] = useState(''); 
+    const [subjects, setSubjects] = useState([]); 
+    const [enrollments, setEnrollments] = useState([]); 
+    const [error, setError] = useState(null); 
+    const [enrollmentError, setEnrollmentError] = useState(null);
+    const [showForm, setShowForm] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [filterId, setFilterId] = useState(''); // Estado para el ID a filtrar
+    const [formData, setFormData] = useState({
+        name: "",
+        username: "",
+        password: "",
+        email: "",
+        role: "",
+        id: "",
+    });
+    const [filteredUser , setFilteredUser ] = useState(null); // Estado para almacenar el usuario filtrado
 
-  useEffect(() => {
-    const id = localStorage.getItem("clientId"); // Suponiendo que guardas el ID del cliente
-    if (id) {
-      setClientId(id);
-      fetchClientData(id); // Llama a la función para cargar los datos del cliente
-      fetchSubjects(); // Llama a la función para cargar las asignaturas
-    }
-  }, []);
-
-  const fetchClientData = async (id) => {
-    try {
-      const data = await fetchEnrollmentsByClientId(id); // Asegúrate de que esta función devuelva los datos del cliente
-      setClientData(data); // Ajusta esto según la estructura de los datos
-    } catch (error) {
-      console.error("Error fetching client data:", error);
-    }
-  };
-
-  const fetchSubjects = async () => {
-    try {
-      const subjectsData = await fetchAllSubjects(); // Obtener todas las asignaturas
-      setSubjects(subjectsData);
-    } catch (error) {
-      console.error("Error fetching subjects:", error);
-    }
-  };
-
-  const handleFetchEnrollments = async (e) => {
-    e.preventDefault(); // Evita el comportamiento por defecto del formulario
-    await getEnrollments(clientId); // Llama a la función del hook con el ID del cliente
-  };
-
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
-    setClientData({ ...clientData, [name]: value });
-  };
-  
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const userDataToUpdate = {
-      id: clientData.id,
-      name: clientData.name,
-      username: clientData.username,
-      email: clientData.email,
-      ...(clientData.password && { password: clientData.password }),
-      role: clientData.role,
+    const fetchSubjects = async () => {
+        try {
+            const subjectsData = await fetchAllSubjects();
+            const usersData = await fetchAllUsers();
+            setUsers(usersData);
+            setSubjects(subjectsData);
+        } catch (err) {
+            setError('Error al obtener las asignaturas.');
+            console.error(err);
+        }
     };
 
-    console.log("Datos a enviar para actualizar el usuario:", userDataToUpdate); // Verifica los datos aquí
+    const fetchEnrollments = async () => {
+        setEnrollmentError(null); 
+        try {
+            const enrollmentsData = await fetchEnrollmentsByClientId(clientId); 
+            setEnrollments(enrollmentsData); 
+        } catch (error) {
+            setEnrollmentError('Error al obtener las inscripciones.');
+            console.error(error);
+        }
+    };
 
-    try {
-      const response = await updateUser(clientId, userDataToUpdate);
-      if (!response.ok) {
-        throw new Error("Error al actualizar los datos.");
-      }
-      alert("Datos actualizados exitosamente.");
-    } catch (error) {
-      console.error("Error al actualizar los datos:", error);
-      alert("Error al actualizar los datos.");
-    }
-  };
+    useEffect(() => {
+        fetchSubjects(); 
+    }, []);
 
-  const handleEnrollmentChange = (e) => {
-    const { name, value } = e.target;
-    setEnrollmentData({ ...enrollmentData, [name]: value });
-  };
+    useEffect(() => {
+        const handleFilterChange = async () => {
+            if (filterId) {
+                const userId = Number(filterId);
+                const user = users.find(user => user.id === userId);
+                if (user) {
+                    setFilteredUser (user); // Almacena el usuario filtrado
+                    setFormData({
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        username: user.username,
+                        password: "",
+                        role: user.role,
+                    });
+                    setShowForm(true);
+                    await fetchEnrollmentsByClientId(user.id); // Obtiene inscripciones del usuario
+                } else {
+                    setFilteredUser (null); // No se encontró el usuario
+                    setFormData({
+                        name: "",
+                        username: "",
+                        password: "",
+                        email: "",
+                        role: "",
+                        id: "",
+                    });
+                    setShowForm(false);
+                }
+            } else {
+                setFilteredUser (null); // Reinicia el usuario filtrado
+                setFormData({
+                    name: "",
+                    username: "",
+                    password: "",
+                    email: "",
+                    role: "",
+                    id: "",
+                });
+                setShowForm(false);
+            }
+        };
 
-  const handleEnrollmentSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createEnrollment({ ...enrollmentData, clientId }); // Crear inscripción
-      await getEnrollments(clientId); // Obtener inscripciones actualizadas
-      setEnrollmentData({ subjectId: "", clientId }); // Limpiar el formulario
-      alert("Inscripción creada exitosamente.");
-    } catch (error) {
-      console.error("Error al crear la inscripción:", error);
-      alert(`Error al gestionar la inscripción: ${error.message}`);
-    }
-  };
+        handleFilterChange();
+    }, [filterId, users]);
 
-  const handleDeleteEnrollment = async (enrollmentId) => {
-    console.log("ID de inscripción recibido para eliminación:", enrollmentId);
-    if (!enrollmentId) {
-        console.error("ID de inscripción no válido.");
-        alert("No se puede eliminar la inscripción. ID no válido.");
-        return; // Salir si el ID es inválido
-    }
+    const handleFormChange = (e) => {
+        const { name, value } = e.target;
+        const newValue = name === "role" ? Number(value) : value;
+        setFormData({ ...formData, [name]: newValue });
+    };
 
-    try {
-        console.log("Intentando eliminar la inscripción con ID:", enrollmentId);
-        await deleteEnrollment(enrollmentId);
-        await getEnrollments(clientId); // Obtener inscripciones actualizadas
-        alert("Inscripción eliminada exitosamente.");
-    } catch (error) {
-        console.error("Error al eliminar la inscripción:", error);
-        alert(`Error al eliminar la inscripción: ${error.message}`);
-    }
-};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const dataToSubmit = {
+                id: formData.id,
+                name: formData.name,
+                email: formData.email,
+                ...(formData.password && { password: formData.password }),
+                username: formData.username,
+                role: formData.role,
+            };
 
-  return (
-    <div className="client-dashboard">
-      <h1>Dashboard del Estudiante</h1>
-      <form onSubmit={handleFetchEnrollments}>
-        <input
-          type="number"
-          placeholder="Ingrese ID del Estudiante"
-          value={clientId}
-          onChange={(e) => setClientId(e.target.value)}
-          required
-        />
-        <button type="submit">Mostrar Inscripciones</button>
-      </form>
-      {error && <p className="error-message">{error}</p>}
-      <h2>Mis Inscripciones</h2>
-      <ul>
-        {enrollments.map((enrollment) => {
-          return (
-            <li key={enrollment.enrollmentId}>
-              {enrollment.title}, {enrollment.description},{" "}
-              {enrollment.enrollmentId}
-              <button
-                onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)}
-              >
-                Eliminar
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+            console.log("Datos a enviar:", dataToSubmit);
 
-      <h2>Inscribirse en Asignaturas</h2>
-      <form onSubmit={handleEnrollmentSubmit}>
-        <select
-          name="subjectId"
-          value={enrollmentData.subjectId}
-          onChange={handleEnrollmentChange}
-          required
-        >
-          <option value="" disabled>
-            Seleccione una Asignatura
-          </option>
-          {subjects.map((subject) => (
-            <option key={subject.subjectId} value={subject.subjectId}>
-              {subject.title}
-            </option>
-          ))}
-        </select>
-        <input type="hidden" name="clientId" value={clientId} />
-        <button type="submit">Inscribirse</button>
-      </form>
+            if (formData.id ) {
+                await updateUser (formData.id, dataToSubmit);
+            } else {
+                console.log("Usuario No encontrado");
+            }
 
-      <h2>Actualizar Mis Datos</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="id"
-          value={clientData.id}
-          onChange={handleFormChange}
-          placeholder="ID del Cliente"
-          required
-        />
-        <input
-          type="text"
-          name="name"
-          value={clientData.name}
-          onChange={handleFormChange}
-          placeholder="Nombre"
-          required
-        />
-        <input
-          type="text"
-          name="username"
-          value={clientData.username}
-          onChange={handleFormChange}
-          placeholder="Nombre de usuario"
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          value={clientData.email}
-          onChange={handleFormChange}
-          placeholder="Correo electrónico"
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          value={clientData.password}
-          onChange={handleFormChange}
-          placeholder="Nueva contraseña"
-        />
-        <select
-          name="role"
-          value={clientData.role}
-          onChange={handleFormChange}
-          required
-        >
-          <option value="" disabled>
-            Seleccione un rol
-          </option>
-          <option value={1}>Rol Alumno</option>
-        </select>
-        <button type="submit">Actualizar Datos</button>
-      </form>
-    </div>
-  );
+            const usersData = await fetchAllUsers();
+            setUsers(usersData);
+            setShowForm(false);
+            setFormData({
+                name: "",
+                username: "",
+                password: "",
+                email: "",
+                role: "",
+                id: "",
+            });
+        } catch (error) {
+            console.error("Error al enviar el formulario:", error);
+            alert(`Error al crear el usuario: ${error.message}`);
+        }
+    };
+
+    const handleEnroll = async (subjectId) => {
+        setEnrollmentError(null); 
+        try {
+            const enrollmentData = {
+                subjectId: subjectId,
+                clientId: clientId,
+            };
+            await createEnrollment(enrollmentData); 
+            alert('Inscripción exitosa'); 
+            fetchEnrollments(); 
+        } catch (error) {
+            setEnrollmentError('Error al inscribirse en la asignatura.');
+            console.error(error);
+        }
+    };
+
+    const handleDeleteEnrollment = async (enrollmentId) => {
+        setEnrollmentError(null); 
+        try {
+            await deleteEnrollment(enrollmentId);
+            alert('Inscripción eliminada exitosamente'); 
+            fetchEnrollments(); 
+        } catch (error) {
+            setEnrollmentError('Error al eliminar la inscripción.');
+            console.error(error);
+        }
+    };
+
+
+
+    return (
+        <div className="client-dashboard">
+            <h1>Dashboard del Estudiante</h1>
+            <form onSubmit={(e) => e.preventDefault()}>
+                <input 
+                    type="number" 
+                    placeholder="Ingrese ID del Estudiante" 
+                    value={clientId} 
+                    onChange={(e) => setClientId(e.target.value)} 
+                    required 
+                />
+                <button type="button" onClick={fetchEnrollments}>Buscar</button>
+            </form>
+            {error && <p className="error-message">{error}</p>}
+            {enrollmentError && <p className="error-message">{enrollmentError}</p>}
+            <h2>Inscripciones</h2>
+            <ul>
+                {enrollments.length > 0 ? (
+                    enrollments.map(enrollment => (
+                        <li key={enrollment.enrollmentId}>
+                            {enrollment.title} - {enrollment.description}
+                            <button onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)}>Eliminar</button>
+                        </li>
+                    ))
+                ) : (
+                    <p>No hay inscripciones disponibles.</p>
+                )}
+            </ul>
+            <h2>Asignaturas Disponibles</h2>
+            <ul>
+                {subjects.map(subject => (
+                    <li key={subject.subjectId}>
+                        {subject.title} - {subject.description}
+                        <button onClick={() => handleEnroll(subject.subjectId)}>Inscribirse </button>
+                    </li>
+                ))}
+            </ul>
+
+            <h2>Filtrar Usuarios</h2>
+            <input 
+                type="number" 
+                placeholder="Filtrar por ID de Usuario" 
+                value={filterId} 
+                onChange={(e) => setFilterId(e.target.value)} 
+            />
+
+            {filteredUser  && (
+                <div>
+                    <h3>Usuario Filtrado</h3>
+                    <p>ID: {filteredUser .id}</p>
+                    <p>Nombre: {filteredUser .name}</p>
+                    <p>Correo: {filteredUser .email}</p>
+                    <p>Nombre de Usuario: {filteredUser .username}</p>
+                    <p>Rol: {filteredUser .role}</p>
+                </div>
+            )}
+
+            <section>
+                <button onClick={() => setShowForm(!showForm)}>
+                    {showForm ? "Cerrar Formulario" : "Editar Usuario"}
+                </button>
+                <ul>
+                    
+                </ul>
+            </section>
+
+            {showForm && (
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleFormChange}
+                        placeholder="Nombre de la persona"
+                        required
+                    />
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleFormChange}
+                        placeholder="Nombre de usuario"
+                        required
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleFormChange}
+                        placeholder="Contraseña"
+                        required
+                    />
+                    <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleFormChange}
+                        placeholder="Correo electrónico"
+                        required
+                    />
+                    <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleFormChange}
+                        required
+                    >
+                        <option value="" disabled>
+                            Seleccione un rol
+                        </option>
+                        <option value={0}>Rol Admin</option>
+                        <option value={1}>Rol Alumno</option>
+                        <option value={2}>Rol Profesor</option>
+                    </select>
+                    <input type="hidden" name="id" value={formData.id} />
+                    <button type="submit">Enviar</button>
+                </form>
+            )}
+        </div>
+    );
 };
 
 export default ClientDashboard;
