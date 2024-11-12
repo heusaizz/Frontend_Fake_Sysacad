@@ -296,7 +296,7 @@ const AdminDashboard = () => {
         <ul>
           {users.map((user) => (
             <li key={user.id}>
-              {user.name} - {user.username} - {user.role}
+              {user.name} -  {user.role}
               <button onClick={() => handleEdit(user)}>Editar</button>
               <button onClick={() => handleDelete(user.id)}>Eliminar</button>
             </li>
