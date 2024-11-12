@@ -1,0 +1,71 @@
+.admin-dashboard {
+    padding: 20px; /* Espacio alrededor del contenido */
+    max-width: 800px; /* Ancho máximo del dashboard */
+    margin: auto; /* Centrar el dashboard */
+    border: 1px solid #ccc; /* Borde alrededor del dashboard */
+    border-radius: 8px; /* Bordes redondeados */
+    background-color: white; /* Color de fondo */
+}
+
+h1, h2 {
+    margin-bottom: 15px;
+    color: black; /* Espacio debajo de los encabezados */
+}
+
+form {
+    margin-bottom: 20px; /* Espacio debajo de los formularios */
+    display: flex; /* Usar flexbox para el diseño */
+    flex-direction: column; /* Colocar elementos en columna */
+}
+
+.admin-dashboard li {
+    background: darkgrey;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+input, select, button {
+    margin-bottom: 15px; /* Espacio entre los elementos del formulario */
+    padding: 10px; /* Espacio interno */
+    border: 1px solid #ccc; /* Borde de los inputs */
+    border-radius: 4px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de fuente */
+    transition: border-color 0.3s; /* Transición suave para el borde */
+}
+
+input:focus, select:focus {
+    border-color: #007bff; /* Cambiar el color del borde al enfocar */
+    outline: none; /* Eliminar el contorno por defecto */
+}
+
+button {
+    background-color: #007bff; /* Color de fondo del botón */
+    color: white; /* Color del texto */
+    cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */
+    border: none; /* Sin borde */
+    padding: 10px 15px; /* Espacio interno del botón */
+    font-size: 16px; /* Tamaño de fuente del botón */
+    border-radius: 4px; /* Bordes redondeados */
+    transition: background-color 0.3s; /* Transición suave para el color de fondo */
+}
+
+button:hover {
+    background-color: #0056b3; /* Color de fondo al pasar el ratón */
+}
+
+.error-message {
+    color: red; /* Color del mensaje de error */
+    margin-top: 10px; /* Espacio arriba del mensaje de error */
+}
+
+@media (max-width: 600px) {
+    .admin-dashboard {
+        padding: 10px; /* Menos padding en pantallas pequeñas */
+    }
+
+    input, select, button {
+        font-size: 14px; /* Ajustar el tamaño de fuente en pantallas pequeñas */
+    }
+}
