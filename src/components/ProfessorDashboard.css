@@ -1,0 +1,39 @@
+.professor-dashboard {
+    padding: 20px;
+    background-color: #f0f4f8; /* Color de fondo claro */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px; /* Ancho máximo para el contenedor */
+    margin: 20px auto; /* Centrar el contenedor */
+}
+
+.professor-dashboard h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #333; /* Color del texto */
+}
+
+.professor-dashboard h2 {
+    font-size: 1.8em;
+    color: #555; /* Color del texto de los subtítulos */
+    margin-bottom: 10px; /* Espacio debajo de los subtítulos */
+}
+
+.professor-dashboard ul {
+    list-style-type: none; /* Eliminar viñetas */
+    padding: 0; /* Eliminar padding */
+}
+
+.professor-dashboard li {
+    background: darkgrey; /* Fondo blanco para cada elemento de la lista */
+    margin: 10px 0;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.professor-dashboard h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #007bff; /* Color del nombre del cliente */
+}
