@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { authenticateUser  } from '../services/api';
+import { useAuth } from '../context/AuthContext'; // Importa el hook useAuth
 import UTNPNG from "../assets/UTNPNG.png";
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState(''); 
+    const [message, setMessage] = useState('');
+    const { login } = useAuth(); 
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const token = await authenticateUser (username, password);
-            localStorage.setItem('jwtToken', token); // Guarda el token en el localStorage
+            login(token); // Llama a la función login del contexto
             setMessage('Inicio de sesión exitoso'); 
-            
         } catch (error) {
             console.error('Error de autenticación:', error);
             setMessage('Usuario o contraseña incorrectos'); 
@@ -45,7 +46,7 @@ const Login = () => {
             <p className={message === 'Inicio de sesión exitoso' ? 'success-message' : 'error-message'}>
                 {message}
             </p>
-        )}
+            )}
         </div>
     );
 };

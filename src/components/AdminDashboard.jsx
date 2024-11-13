@@ -28,7 +28,7 @@ const AdminDashboard = () => {
     username: "",
     password: "",
     email: "",
-    role: "",
+    role: "", //agregar a este repo el cust hook, path 404 implementar si se accede a algo que no y demas
     id: "",
   });
 

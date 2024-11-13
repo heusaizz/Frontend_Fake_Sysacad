@@ -7,6 +7,7 @@ import Login from './components/Login';
 import LogoutButton from './components/LogoutButton';
 import PrivateRoute from './routes/PrivateRoute';
 import NoAccess from './routes/NoAccess';
+import NotFound from './routes/NotFound';
 
 const App = () => {
     const isLoggedIn = !!localStorage.getItem('jwtToken');
@@ -55,6 +56,7 @@ const App = () => {
                     } 
                 />
                 <Route path="/no-access" element={<NoAccess />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>
     );

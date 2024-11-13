@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Importa el hook useAuth
 import "./LogoutButton.css";
 
 const LogoutButton = () => {
     const navigate = useNavigate();
+    const { logout } = useAuth(); // Desestructura la función logout del contexto
 
     const handleLogout = () => {
-        localStorage.removeItem('jwtToken'); // Elimina el token
+        logout(); // Llama a la función logout del contexto
         navigate('/login'); // Redirige a la página de inicio de sesión
     };
 

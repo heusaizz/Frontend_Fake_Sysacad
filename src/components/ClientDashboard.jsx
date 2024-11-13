@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { fetchAllSubjects, createEnrollment, fetchEnrollmentsByClientId, deleteEnrollment, fetchAllUsers, updateUser} from '../services/api'; 
+import { fetchAllSubjects, createEnrollment, deleteEnrollment, fetchAllUsers, updateUser  } from '../services/api'; 
+import useEnrollments from '../hooks/useEnrollment'; // Importa el custom hook
 import "./ClientDashboard.css";
 
 const ClientDashboard = () => {
     const [clientId, setClientId] = useState(''); 
     const [subjects, setSubjects] = useState([]); 
-    const [enrollments, setEnrollments] = useState([]); 
     const [error, setError] = useState(null); 
-    const [enrollmentError, setEnrollmentError] = useState(null);
     const [showForm, setShowForm] = useState(false);
     const [users, setUsers] = useState([]);
     const [filterId, setFilterId] = useState(''); // Estado para el ID a filtrar
@@ -20,8 +19,9 @@ const ClientDashboard = () => {
         id: "",
     });
     const [filteredUser , setFilteredUser ] = useState(null); 
-
     const [successMessage1, setSuccessMessage1] = useState('');
+
+    const { enrollments, error: enrollmentError, getEnrollments } = useEnrollments(); 
 
     const fetchSubjects = async () => {
         try {
@@ -32,17 +32,6 @@ const ClientDashboard = () => {
         } catch (err) {
             setError('Error al obtener las asignaturas.');
             console.error(err);
-        }
-    };
-
-    const fetchEnrollments = async () => {
-        setEnrollmentError(null); 
-        try {
-            const enrollmentsData = await fetchEnrollmentsByClientId(clientId); 
-            setEnrollments(enrollmentsData); 
-        } catch (error) {
-            setEnrollmentError('Error al obtener las inscripciones.');
-            console.error(error);
         }
     };
 
@@ -66,7 +55,7 @@ const ClientDashboard = () => {
                         role: user.role,
                     });
                     setShowForm(true);
-                    await fetchEnrollmentsByClientId(user.id); // Obtiene inscripciones del usuario
+                    await getEnrollments(user.id); // Obtiene inscripciones del usuario
                 } else {
                     setFilteredUser (null); // No se encontró el usuario
                     setFormData({
@@ -80,7 +69,7 @@ const ClientDashboard = () => {
                     setShowForm(false);
                 }
             } else {
-                setFilteredUser (null); // Reinicia el usuario filtrado
+                setFilteredUser  (null); // Reinicia el usuario filtrado
                 setFormData({
                     name: "",
                     username: "",
@@ -94,7 +83,7 @@ const ClientDashboard = () => {
         };
 
         handleFilterChange();
-    }, [filterId, users]);
+    });
 
     const handleFormChange = (e) => {
         const { name, value } = e.target;
@@ -116,7 +105,7 @@ const ClientDashboard = () => {
 
             console.log("Datos a enviar:", dataToSubmit);
 
-            if (formData.id ) {
+            if (formData.id) {
                 await updateUser (formData.id, dataToSubmit);
                 console.log("Datos de usuario actualizados.");
             } else {
@@ -141,7 +130,6 @@ const ClientDashboard = () => {
     };
 
     const handleEnroll = async (subjectId) => {
-        setEnrollmentError(null); 
         try {
             const enrollmentData = {
                 subjectId: subjectId,
@@ -152,25 +140,20 @@ const ClientDashboard = () => {
             setTimeout(() => {
                 setSuccessMessage1('');
             }, 3000);
-            fetchEnrollments(); 
+            getEnrollments(clientId); // Actualiza las inscripciones después de inscribirse
         } catch (error) {
-            setEnrollmentError('Error al inscribirse en la asignatura.');
-            console.error(error);
+            console.error('Error al inscribirse en la asignatura:', error);
         }
     };
 
     const handleDeleteEnrollment = async (enrollmentId) => {
-        setEnrollmentError(null); 
         try {
             await deleteEnrollment(enrollmentId); 
-            fetchEnrollments(); 
+            getEnrollments(clientId); // Actualiza las inscripciones después de eliminar
         } catch (error) {
-            setEnrollmentError('Error al eliminar la inscripción.');
-            console.error(error);
+            console.error('Error al eliminar la inscripción:', error);
         }
     };
-
-
 
     return (
         <div className="client-dashboard">
@@ -183,7 +166,7 @@ const ClientDashboard = () => {
                     onChange={(e) => setClientId(e.target.value)} 
                     required 
                 />
-                <button type="button" onClick={fetchEnrollments}>Buscar</button>
+                <button type="button" onClick={() => getEnrollments(clientId)}>Buscar</button>
             </form>
             {error && <p className="error-message">{error}</p>}
             {enrollmentError && <p className="error-message">{enrollmentError}</p>}
@@ -196,11 +179,9 @@ const ClientDashboard = () => {
                             <button 
                                 onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)} 
                                 style={{ marginLeft: '20px' }}
-                                
                             >
                                 Eliminar
                             </button>
-                            
                         </li>
                     ))
                 ) : (
@@ -214,7 +195,7 @@ const ClientDashboard = () => {
                         <span>{subject.title} - {subject.description}</span>
                         <button 
                             onClick={() => handleEnroll(subject.subjectId)} 
-                            style={{ marginLeft: '20px' }} // Espacio entre el texto y el botón
+                            style={{ marginLeft: '20px' }}
                         >
                             Inscribirse
                         </button>
@@ -237,7 +218,7 @@ const ClientDashboard = () => {
                     <p>ID: {filteredUser .id}</p>
                     <p>Nombre: {filteredUser .name}</p>
                     <p>Correo: {filteredUser .email}</p>
-                    <p>Nombre de Usuario: {filteredUser .userName}</p>
+                    <p>Nombre de Usuario: {filteredUser .username}</p>
                     <p>Rol: {filteredUser .role}</p>
                 </div>
             )}
@@ -291,9 +272,8 @@ const ClientDashboard = () => {
                         <option value="" disabled>
                             Seleccione un rol
                         </option>
-                        <option value={""}>Seleccione una opción</option>
                         <option value={1}>Rol Alumno</option>
-                        <option value={""}></option>
+                        <option value={2}>Rol Profesor</option>
                     </select>
                     <input type="hidden" name="id" value={formData.id} />
                     <button type="submit">Enviar</button>
