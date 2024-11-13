@@ -19,7 +19,9 @@ const ClientDashboard = () => {
         role: "",
         id: "",
     });
-    const [filteredUser , setFilteredUser ] = useState(null); // Estado para almacenar el usuario filtrado
+    const [filteredUser , setFilteredUser ] = useState(null); 
+
+    const [successMessage1, setSuccessMessage1] = useState('');
 
     const fetchSubjects = async () => {
         try {
@@ -146,7 +148,10 @@ const ClientDashboard = () => {
                 clientId: clientId,
             };
             await createEnrollment(enrollmentData); 
-            alert('Inscripción exitosa'); 
+            setSuccessMessage1('¡Inscripción realizada!');
+            setTimeout(() => {
+                setSuccessMessage1('');
+            }, 3000);
             fetchEnrollments(); 
         } catch (error) {
             setEnrollmentError('Error al inscribirse en la asignatura.');
@@ -157,8 +162,7 @@ const ClientDashboard = () => {
     const handleDeleteEnrollment = async (enrollmentId) => {
         setEnrollmentError(null); 
         try {
-            await deleteEnrollment(enrollmentId);
-            alert('Inscripción eliminada exitosamente'); 
+            await deleteEnrollment(enrollmentId); 
             fetchEnrollments(); 
         } catch (error) {
             setEnrollmentError('Error al eliminar la inscripción.');
@@ -192,9 +196,11 @@ const ClientDashboard = () => {
                             <button 
                                 onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)} 
                                 style={{ marginLeft: '20px' }}
+                                
                             >
                                 Eliminar
                             </button>
+                            
                         </li>
                     ))
                 ) : (
@@ -212,6 +218,7 @@ const ClientDashboard = () => {
                         >
                             Inscribirse
                         </button>
+                        {successMessage1 && <span className="success-message1">{successMessage1}</span>}
                     </li>
                 ))}
             </ul>

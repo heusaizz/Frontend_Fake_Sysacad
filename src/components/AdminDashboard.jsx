@@ -401,7 +401,7 @@ const AdminDashboard = () => {
       <ul>
           {subjects.map((subject) => (
               <li key={subject.subjectId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
-                  <span>{subject.title}</span>
+                  <span>{subject.title} - ID: {subject.subjectId}</span>
                   <div>
                       <button 
                           onClick={() => handleDeleteSubject(subject.subjectId)} 
