@@ -116,6 +116,7 @@ const ClientDashboard = () => {
 
             if (formData.id ) {
                 await updateUser (formData.id, dataToSubmit);
+                console.log("Datos de usuario actualizados.");
             } else {
                 console.log("Usuario No encontrado");
             }
@@ -219,7 +220,7 @@ const ClientDashboard = () => {
                     <p>ID: {filteredUser .id}</p>
                     <p>Nombre: {filteredUser .name}</p>
                     <p>Correo: {filteredUser .email}</p>
-                    <p>Nombre de Usuario: {filteredUser .username}</p>
+                    <p>Nombre de Usuario: {filteredUser .userName}</p>
                     <p>Rol: {filteredUser .role}</p>
                 </div>
             )}
@@ -276,9 +277,9 @@ const ClientDashboard = () => {
                         <option value="" disabled>
                             Seleccione un rol
                         </option>
-                        <option value={0}>Rol Admin</option>
+                        <option value={""}>Seleccione una opción</option>
                         <option value={1}>Rol Alumno</option>
-                        <option value={2}>Rol Profesor</option>
+                        <option value={""}></option>
                     </select>
                     <input type="hidden" name="id" value={formData.id} />
                     <button type="submit">Enviar</button>
