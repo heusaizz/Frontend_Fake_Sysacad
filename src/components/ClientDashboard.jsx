@@ -174,7 +174,7 @@ const ClientDashboard = () => {
             <form onSubmit={(e) => e.preventDefault()}>
                 <input 
                     type="number" 
-                    placeholder="Ingrese ID del Estudiante" 
+                    placeholder="Ingrese su legajo de Estudiante" 
                     value={clientId} 
                     onChange={(e) => setClientId(e.target.value)} 
                     required 
@@ -216,10 +216,10 @@ const ClientDashboard = () => {
                 ))}
             </ul>
 
-            <h2>Filtrar Usuarios</h2>
+            <h2>Ver mis datos de Usuario</h2>
             <input 
                 type="number" 
-                placeholder="Filtrar por ID de Usuario" 
+                placeholder="Filtrar por legajo de Usuario" 
                 value={filterId} 
                 onChange={(e) => setFilterId(e.target.value)} 
             />

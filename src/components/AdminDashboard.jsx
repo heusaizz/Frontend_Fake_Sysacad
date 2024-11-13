@@ -296,7 +296,7 @@ const AdminDashboard = () => {
         <ul>
             {users.map((user) => (
                 <li key={user.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
-                    <span>{user.name} - {user.role}</span>
+                    <span>{user.name} - {user.role} - Legajo: {user.id}</span>
                     <div>
                         <button 
                             onClick={() => handleEdit(user)} 
@@ -339,7 +339,7 @@ const AdminDashboard = () => {
               name="clientId"
               value={enrollmentData.clientId}
               onChange={handleEnrollmentFormChange}
-              placeholder="ID del Cliente"
+              placeholder="Legajo del estudiante"
               required
             />
             <input type="hidden" name="id" value={enrollmentData.id} />

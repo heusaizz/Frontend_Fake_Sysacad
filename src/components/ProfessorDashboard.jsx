@@ -32,7 +32,7 @@ const ProfessorDashboard = () => {
             <form onSubmit={handleFetchStudents}>
                 <input 
                     type="number" 
-                    placeholder="Ingrese ID del Profesor" 
+                    placeholder="Ingrese su legajo de Profesor" 
                     value={professorId} 
                     onChange={(e) => setProfessorId(e.target.value)} 
                     required 
