@@ -294,13 +294,25 @@ const AdminDashboard = () => {
       <section>
         <h2>Usuarios</h2>
         <ul>
-          {users.map((user) => (
-            <li key={user.id}>
-              {user.name} -  {user.role}
-              <button onClick={() => handleEdit(user)}>Editar</button>
-              <button onClick={() => handleDelete(user.id)}>Eliminar</button>
-            </li>
-          ))}
+            {users.map((user) => (
+                <li key={user.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
+                    <span>{user.name} - {user.role}</span>
+                    <div>
+                        <button 
+                            onClick={() => handleEdit(user)} 
+                            style={{ marginLeft: '20px' }} // Espacio entre el texto y el primer botón
+                        >
+                            Editar
+                        </button>
+                        <button 
+                            onClick={() => handleDelete(user.id)} 
+                            style={{ marginLeft: '10px' }} // Espacio entre los botones
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+                </li>
+            ))}
         </ul>
       </section>
 
@@ -335,23 +347,29 @@ const AdminDashboard = () => {
           </form>
         )}
 
-        <ul>
+      <ul>
           {enrollments.map((enrollment) => (
-            <li key={enrollment.enrollmentId}>
-              {enrollment.subjectTitle} <h3>Legajo: </h3> {enrollment.clientId}
-              <button
-                onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)}
-              >
-                Eliminar
-              </button>
-            </li>
+              <li key={enrollment.enrollmentId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
+                  <span>{enrollment.subjectTitle} <h3 style={{ display: 'inline', margin: '0' }}> - Legajo:</h3> {enrollment.clientId}</span>
+                  <button 
+                      onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)} 
+                      style={{ marginLeft: '20px' }} // Espacio entre el texto y el botón
+                  >
+                      Eliminar
+                  </button>
+              </li>
           ))}
-        </ul>
+      </ul>
       </section>
 
-      
-
-      {showSubjectForm && (
+      <section>
+        <h2>Asignaturas</h2>
+        <button onClick={() => setShowSubjectForm(!showSubjectForm)}>
+        {showSubjectForm
+          ? "Cerrar Formulario de Asignatura"
+          : "Agregar/Editar Asignatura"}
+        </button>
+        {showSubjectForm && (
         <form onSubmit={handleSubjectSubmit}>
           <input
             type="text"
@@ -380,25 +398,27 @@ const AdminDashboard = () => {
           <button type="submit">Enviar</button>
         </form>
       )}
-
-      <section>
-        <h2>Asignaturas</h2>
-        <button onClick={() => setShowSubjectForm(!showSubjectForm)}>
-        {showSubjectForm
-          ? "Cerrar Formulario de Asignatura"
-          : "Agregar/Editar Asignatura"}
-      </button>
-        <ul>
+      <ul>
           {subjects.map((subject) => (
-            <li key={subject.subjectId}>
-              {subject.title}
-              <button onClick={() => handleDeleteSubject(subject.subjectId)}>
-                Eliminar
-              </button>
-              <button onClick={() => handleEditSubject(subject)}>Editar</button>
-            </li>
+              <li key={subject.subjectId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
+                  <span>{subject.title}</span>
+                  <div>
+                      <button 
+                          onClick={() => handleDeleteSubject(subject.subjectId)} 
+                          style={{ marginLeft: '20px' }} // Espacio entre el texto y el botón
+                      >
+                          Eliminar
+                      </button>
+                      <button 
+                          onClick={() => handleEditSubject(subject)} 
+                          style={{ marginLeft: '10px' }} // Espacio entre los botones
+                      >
+                          Editar
+                      </button>
+                  </div>
+              </li>
           ))}
-        </ul>
+      </ul>
       </section>
     </div>
   );

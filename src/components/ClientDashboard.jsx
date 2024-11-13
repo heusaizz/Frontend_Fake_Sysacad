@@ -187,9 +187,14 @@ const ClientDashboard = () => {
             <ul>
                 {enrollments.length > 0 ? (
                     enrollments.map(enrollment => (
-                        <li key={enrollment.enrollmentId}>
-                            {enrollment.title} - {enrollment.description}
-                            <button onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)}>Eliminar</button>
+                        <li key={enrollment.enrollmentId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
+                            <span>{enrollment.title} - {enrollment.description}</span>
+                            <button 
+                                onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)} 
+                                style={{ marginLeft: '20px' }}
+                            >
+                                Eliminar
+                            </button>
                         </li>
                     ))
                 ) : (
@@ -199,9 +204,14 @@ const ClientDashboard = () => {
             <h2>Asignaturas Disponibles</h2>
             <ul>
                 {subjects.map(subject => (
-                    <li key={subject.subjectId}>
-                        {subject.title} - {subject.description}
-                        <button onClick={() => handleEnroll(subject.subjectId)}>Inscribirse </button>
+                    <li key={subject.subjectId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', border: '1px solid #ccc', marginBottom: '5px' }}>
+                        <span>{subject.title} - {subject.description}</span>
+                        <button 
+                            onClick={() => handleEnroll(subject.subjectId)} 
+                            style={{ marginLeft: '20px' }} // Espacio entre el texto y el botón
+                        >
+                            Inscribirse
+                        </button>
                     </li>
                 ))}
             </ul>
@@ -229,9 +239,6 @@ const ClientDashboard = () => {
                 <button onClick={() => setShowForm(!showForm)}>
                     {showForm ? "Cerrar Formulario" : "Editar Usuario"}
                 </button>
-                <ul>
-                    
-                </ul>
             </section>
 
             {showForm && (
