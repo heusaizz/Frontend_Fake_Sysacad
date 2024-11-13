@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Home from './components/Home';
-import AdminView from './components/AdminView'; // Importa AdminView
-import ClientView from './components/ClientView'; // Importa ClientView
-import ProfessorView from './components/ProfessorView'; // Importa ProfessorView
+import AdminView from './components/AdminView'; 
+import ClientView from './components/ClientView'; 
+import ProfessorView from './components/ProfessorView'; 
 import Login from './components/Login';
 import LogoutButton from './components/LogoutButton';
 import PrivateRoute from './routes/PrivateRoute';
@@ -22,7 +22,7 @@ const App = () => {
                             <li><Link to="/admin-view">Administrador</Link></li>
                             <li><Link to="/client-view">Estudiante</Link></li>
                             <li><Link to="/professor-view">Profesor</Link></li>
-                            <LogoutButton /> {/* Incluye el botón de cerrar sesión */}
+                            <LogoutButton /> 
                         </>
                     )}
                 </ul>

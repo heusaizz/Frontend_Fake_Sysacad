@@ -1,4 +1,3 @@
-// src/hooks/useEnrollment.js
 import { useState } from 'react';
 import { fetchEnrollmentsByClientId, fetchAllEnrollments } from '../services/api';
 
@@ -20,7 +19,7 @@ const useEnrollments = () => {
     const getAllEnrollments = async () => {
         setError(null);
         try {
-            const data = await fetchAllEnrollments(); // Asegúrate de que esta función esté definida en tu API
+            const data = await fetchAllEnrollments(); 
             setEnrollments(data || []);
         } catch (error) {
             console.error('Error fetching all enrollments:', error);

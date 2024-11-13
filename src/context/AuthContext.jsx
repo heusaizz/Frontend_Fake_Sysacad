@@ -1,10 +1,8 @@
 import  { createContext, useContext, useState, useEffect } from 'react';
-import PropTypes from 'prop-types'; // Importa PropTypes
+import PropTypes from 'prop-types'; 
 
-// Crear el contexto
 const AuthContext = createContext();
 
-// Proveedor del contexto
 export const AuthProvider = ({ children }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -32,12 +30,10 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Validación de las propiedades
 AuthProvider.propTypes = {
-    children: PropTypes.node.isRequired, // Valida que children sea requerido y sea un nodo React
+    children: PropTypes.node.isRequired, 
 };
 
-// Hook para usar el contexto
 export const useAuth = () => {
     return useContext(AuthContext);
 };

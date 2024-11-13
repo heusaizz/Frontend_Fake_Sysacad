@@ -1,4 +1,3 @@
-// src/routes/NoAccess.jsx
 import "./NoAccess.css";
 import naonao from "../assets/naonao.jpg";
 

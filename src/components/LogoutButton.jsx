@@ -12,7 +12,7 @@ const LogoutButton = () => {
     const isLoggedIn = !!localStorage.getItem('jwtToken');
 
     if (!isLoggedIn) {
-        return null; // No renderiza el botón si no hay token
+        return null; 
     }
 
     return (

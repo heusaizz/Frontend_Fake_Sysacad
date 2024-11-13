@@ -5,18 +5,18 @@ import UTNPNG from "../assets/UTNPNG.png";
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState(''); // Estado para el mensaje
+    const [message, setMessage] = useState(''); 
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const token = await authenticateUser (username, password);
             localStorage.setItem('jwtToken', token); // Guarda el token en el localStorage
-            setMessage('Inicio de sesión exitoso'); // Mensaje de éxito
-            // Redirigir a la página de dashboard (puedes usar react-router-dom para esto)
+            setMessage('Inicio de sesión exitoso'); 
+            
         } catch (error) {
             console.error('Error de autenticación:', error);
-            setMessage('Usuario o contraseña incorrectos'); // Mensaje de error
+            setMessage('Usuario o contraseña incorrectos'); 
         }
     };
 
