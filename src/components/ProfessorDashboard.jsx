@@ -38,7 +38,7 @@ const ProfessorDashboard = () => {
             <ul>
                 {students.map(student => (
                     <li key={student.clientId}>
-                        {student.name} - Asignaturas: {student.subjects && Array.isArray(student.subjects) ? student.subjects.map(subject => subject.title).join(', ') : 'Sin asignaturas'}
+                        {student.name}
                     </li>
                 ))}
             </ul>
