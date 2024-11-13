@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { fetchStudentsAndSubjects } from '../services/api'; // Importa la función de API
+import { fetchStudentsAndSubjects, fetchSubjectsByProfessorId } from '../services/api'; // Asegúrate de que la nueva función esté importada
 import "./ProfessorDashboard.css";
 
 const ProfessorDashboard = () => {
     const [students, setStudents] = useState([]); // Estado para los estudiantes
+    const [subjects, setSubjects] = useState([]); // Estado para las materias
     const [professorId, setProfessorId] = useState(''); // Estado para el ID del profesor
     const [error, setError] = useState(null); // Estado para manejar errores
 
@@ -11,12 +12,17 @@ const ProfessorDashboard = () => {
         e.preventDefault(); // Evita el comportamiento por defecto del formulario
         setError(null); // Resetea el error antes de hacer la solicitud
         try {
-            const data = await fetchStudentsAndSubjects(professorId); // Llama a la función con el ID del profesor
-            console.log(data); // Verifica la estructura de los datos
-            setStudents(data || []); // Asegúrate de que se establezca un arreglo vacío si no hay datos
+            const studentsData = await fetchStudentsAndSubjects(professorId); // Llama a la función con el ID del profesor
+            console.log(studentsData); // Verifica la estructura de los datos
+            setStudents(studentsData || []); // Asegúrate de que se establezca un arreglo vacío si no hay datos
+
+            // Obtén las materias del profesor
+            const subjectsData = await fetchSubjectsByProfessorId(professorId);
+            console.log(subjectsData); // Verifica la estructura de los datos
+            setSubjects(subjectsData || []); // Asegúrate de que se establezca un arreglo vacío si no hay datos
         } catch (error) {
-            console.error('Error fetching students:', error);
-            setError('Error al obtener los alumnos inscriptos.'); // Manejo de errores
+            console.error('Error fetching students or subjects:', error);
+            setError('Error al obtener los alumnos inscriptos o las materias.'); // Manejo de errores
         }
     };
 
@@ -39,6 +45,14 @@ const ProfessorDashboard = () => {
                 {students.map(student => (
                     <li key={student.clientId}>
                         {student.name}
+                    </li>
+                ))}
+            </ul>
+            <h2>Materias Asignadas</h2>
+            <ul>
+                {subjects.map(subject => (
+                    <li key={subject.subjectId}>
+                        {subject.title}
                     </li>
                 ))}
             </ul>

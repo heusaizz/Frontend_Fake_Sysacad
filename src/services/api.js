@@ -359,3 +359,27 @@ export const updateSubject = async (id, subjectData) => {
   }
 };
 
+export const fetchSubjectsByProfessorId = async (professorId) => {
+  const token = localStorage.getItem("jwtToken"); 
+
+  try {
+    const response = await fetch(`${API_URL}/Professor/${professorId}/subjects`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`, 
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al obtener las materias del profesor");
+    }
+
+    const data = await response.json();
+    return data; 
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
