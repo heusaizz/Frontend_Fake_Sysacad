@@ -214,7 +214,7 @@ const ClientDashboard = () => {
             />
 
             {filteredUser  && (
-                <div>
+                <div style={{ color: 'black' }}>
                     <h3>Usuario Filtrado</h3>
                     <p>ID: {filteredUser .id}</p>
                     <p>Nombre: {filteredUser .name}</p>
