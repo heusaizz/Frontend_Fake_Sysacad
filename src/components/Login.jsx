@@ -12,8 +12,10 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const token = await authenticateUser (username, password);
-            login(token); // Llama a la función login del contexto
+            const { token, userId } = await authenticateUser(username, password);
+            console.log('Token recibido:', token);
+            console.log('ID de usuario recibido:', userId);
+            login(token, userId); // Llama a la función login del contexto con el token y el ID de usuario
             setMessage('Inicio de sesión exitoso'); 
         } catch (error) {
             console.error('Error de autenticación:', error);
@@ -43,9 +45,9 @@ const Login = () => {
                 <button type="submit">Iniciar sesión</button>
             </form>
             {message && (
-            <p className={message === 'Inicio de sesión exitoso' ? 'success-message' : 'error-message'}>
-                {message}
-            </p>
+                <p className={message === 'Inicio de sesión exitoso' ? 'success-message' : 'error-message'}>
+                    {message}
+                </p>
             )}
         </div>
     );

@@ -1,33 +1,35 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext'; 
 import { fetchAllSubjects, createEnrollment, deleteEnrollment, fetchAllUsers, updateUser  } from '../services/api'; 
-import useEnrollments from '../hooks/useEnrollment'; // Importa el custom hook
+import useEnrollments from '../hooks/useEnrollment'; 
 import "./ClientDashboard.css";
 
 const ClientDashboard = () => {
-    const [clientId, setClientId] = useState(''); 
+    const { userId } = useAuth(); 
     const [subjects, setSubjects] = useState([]); 
     const [error, setError] = useState(null); 
     const [showForm, setShowForm] = useState(false);
-    const [users, setUsers] = useState([]);
-    const [filterId, setFilterId] = useState(''); // Estado para el ID a filtrar
     const [formData, setFormData] = useState({
         name: "",
         username: "",
         password: "",
         email: "",
         role: "",
-        id: "",
+        id: userId,
     });
-    const [filteredUser , setFilteredUser ] = useState(null); 
+    const [userData, setUserData] = useState({
+        name: "",
+        username: "",
+        email: "",
+        role: "",
+        id: userId,
+    });
     const [successMessage1, setSuccessMessage1] = useState('');
-
     const { enrollments, error: enrollmentError, getEnrollments } = useEnrollments(); 
 
     const fetchSubjects = async () => {
         try {
             const subjectsData = await fetchAllSubjects();
-            const usersData = await fetchAllUsers();
-            setUsers(usersData);
             setSubjects(subjectsData);
         } catch (err) {
             setError('Error al obtener las asignaturas.');
@@ -35,55 +37,40 @@ const ClientDashboard = () => {
         }
     };
 
+    const fetchUserData = async () => {
+        try {
+            const usersData = await fetchAllUsers();
+            const currentUser  = usersData.find(user => user.id === userId);
+            console.log(currentUser );
+            if (currentUser ) {
+                setFormData({
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    username: currentUser.userName, // Asegúrate de que este campo sea correcto
+                    password: "",
+                    role: currentUser.role,
+                });
+                // Establece los datos del usuario para mostrar en la interfaz
+                setUserData({
+                    id: currentUser.id,
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    username: currentUser.userName,
+                    role: currentUser.role,
+                });
+            }
+            await getEnrollments(userId);
+        } catch (err) {
+            setError('Error al obtener los datos del usuario.');
+            console.error(err);
+        }
+    };
+
     useEffect(() => {
         fetchSubjects(); 
-    }, []);
-
-    useEffect(() => {
-        const handleFilterChange = async () => {
-            if (filterId) {
-                const userId = Number(filterId);
-                const user = users.find(user => user.id === userId);
-                if (user) {
-                    setFilteredUser (user); // Almacena el usuario filtrado
-                    setFormData({
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
-                        username: user.username,
-                        password: "",
-                        role: user.role,
-                    });
-                    setShowForm(true);
-                    await getEnrollments(user.id); // Obtiene inscripciones del usuario
-                } else {
-                    setFilteredUser (null); // No se encontró el usuario
-                    setFormData({
-                        name: "",
-                        username: "",
-                        password: "",
-                        email: "",
-                        role: "",
-                        id: "",
-                    });
-                    setShowForm(false);
-                }
-            } else {
-                setFilteredUser  (null); // Reinicia el usuario filtrado
-                setFormData({
-                    name: "",
-                    username: "",
-                    password: "",
-                    email: "",
-                    role: "",
-                    id: "",
-                });
-                setShowForm(false);
-            }
-        };
-
-        handleFilterChange();
-    });
+        fetchUserData(); 
+    }, [userId]);
 
     const handleFormChange = (e) => {
         const { name, value } = e.target;
@@ -105,15 +92,18 @@ const ClientDashboard = () => {
 
             console.log("Datos a enviar:", dataToSubmit);
 
-            if (formData.id) {
-                await updateUser (formData.id, dataToSubmit);
-                console.log("Datos de usuario actualizados.");
-            } else {
-                console.log("Usuario No encontrado");
-            }
+            await updateUser (formData.id, dataToSubmit); 
+            console.log("Datos de usuario actualizados.");
 
-            const usersData = await fetchAllUsers();
-            setUsers(usersData);
+            // Actualiza userData solo después de una actualización exitosa
+            setUserData({
+                id: formData.id,
+                name: formData.name,
+                email: formData.email,
+                username: formData.username,
+                role: formData.role,
+            });
+
             setShowForm(false);
             setFormData({
                 name: "",
@@ -121,11 +111,11 @@ const ClientDashboard = () => {
                 password: "",
                 email: "",
                 role: "",
-                id: "",
+                id: userId,
             });
         } catch (error) {
             console.error("Error al enviar el formulario:", error);
-            alert(`Error al crear el usuario: ${error.message}`);
+            alert(`Error al actualizar el usuario: ${error.message}`);
         }
     };
 
@@ -133,14 +123,14 @@ const ClientDashboard = () => {
         try {
             const enrollmentData = {
                 subjectId: subjectId,
-                clientId: clientId,
+                clientId: userId,
             };
             await createEnrollment(enrollmentData); 
             setSuccessMessage1('¡Inscripción realizada!');
             setTimeout(() => {
                 setSuccessMessage1('');
             }, 3000);
-            getEnrollments(clientId); // Actualiza las inscripciones después de inscribirse
+            getEnrollments(userId);
         } catch (error) {
             console.error('Error al inscribirse en la asignatura:', error);
         }
@@ -149,8 +139,8 @@ const ClientDashboard = () => {
     const handleDeleteEnrollment = async (enrollmentId) => {
         try {
             await deleteEnrollment(enrollmentId); 
-            getEnrollments(clientId); // Actualiza las inscripciones después de eliminar
-        } catch (error) {
+            getEnrollments(userId);
+ } catch (error) {
             console.error('Error al eliminar la inscripción:', error);
         }
     };
@@ -158,16 +148,6 @@ const ClientDashboard = () => {
     return (
         <div className="client-dashboard">
             <h1>Dashboard del Estudiante</h1>
-            <form onSubmit={(e) => e.preventDefault()}>
-                <input 
-                    type="number" 
-                    placeholder="Ingrese su legajo de Estudiante" 
-                    value={clientId} 
-                    onChange={(e) => setClientId(e.target.value)} 
-                    required 
-                />
-                <button type="button" onClick={() => getEnrollments(clientId)}>Buscar</button>
-            </form>
             {error && <p className="error-message">{error}</p>}
             {enrollmentError && <p className="error-message">{enrollmentError}</p>}
             <h2>Inscripciones</h2>
@@ -204,24 +184,13 @@ const ClientDashboard = () => {
                 ))}
             </ul>
 
-            <h2>Ver mis datos de Usuario</h2>
-            <input 
-                type="number" 
-                placeholder="Filtrar por legajo de Usuario" 
-                value={filterId} 
-                onChange={(e) => setFilterId(e.target.value)} 
-            />
-
-            {filteredUser  && (
-                <div style={{ color: 'black' }}>
-                    <h3>Usuario Filtrado</h3>
-                    <p>ID: {filteredUser .id}</p>
-                    <p>Nombre: {filteredUser .name}</p>
-                    <p>Correo: {filteredUser .email}</p>
-                    <p>Nombre de Usuario: {filteredUser .username}</p>
-                    <p>Rol: {filteredUser .role}</p>
-                </div>
-            )}
+            <h2>Mis Datos de Usuario</h2>
+            <div style={{ color: 'black' }}>
+                <p>ID: {userData.id}</p>
+                <p>Nombre: {userData.name}</p>
+                <p>Correo: {userData.email}</p>
+                <p>Nombre de Usuario: {userData.username}</p>
+            </div>
 
             <section>
                 <button onClick={() => setShowForm(!showForm)}>
@@ -253,7 +222,6 @@ const ClientDashboard = () => {
                         value={formData.password}
                         onChange={handleFormChange}
                         placeholder="Contraseña"
-                        required
                     />
                     <input
                         type="email"
@@ -272,8 +240,9 @@ const ClientDashboard = () => {
                         <option value="" disabled>
                             Seleccione un rol
                         </option>
+                        <option value={''}>Seleccione un rol</option>
                         <option value={1}>Rol Alumno</option>
-                        <option value={2}>Rol Profesor</option>
+                        <option value={''}></option>
                     </select>
                     <input type="hidden" name="id" value={formData.id} />
                     <button type="submit">Enviar</button>

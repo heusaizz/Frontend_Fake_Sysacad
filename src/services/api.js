@@ -1,25 +1,27 @@
 const API_URL = "https://localhost:7251/api"; // Cambia esto según la URL de tu API
 
-export const authenticateUser = async (username, password) => {
+export const authenticateUser  = async (username, password) => {
   try {
-    const response = await fetch(`${API_URL}/Authentication/Authenticate`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ UserName: username, Password: password }),
-    });
+      const response = await fetch(`${API_URL}/Authentication/Authenticate`, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ UserName: username, Password: password }),
+      });
 
-    if (!response.ok) {
-      throw new Error("Error de autenticación");
-    }
+      if (!response.ok) {
+          throw new Error("Error de autenticación");
+      }
 
-    const token = await response.text(); 
-    console.log("Token JWT:", token);
-    return token; 
+      const data = await response.json(); // Asegúrate de que la respuesta sea JSON
+      const token = data.token; // Asegúrate de que el token esté en la respuesta
+      const userId = data.userId; // Asegúrate de que el ID de usuario esté en la respuesta
+
+      return { token, userId }; // Devuelve tanto el token como el ID de usuario
   } catch (error) {
-    console.error(error);
-    throw error;
+      console.error(error);
+      throw error;
   }
 };
 
