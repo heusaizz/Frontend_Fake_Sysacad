@@ -58,7 +58,7 @@ const AdminDashboard = () => {
         setEnrollments(enrollmentsData);
         setSubjects(subjectsData);
       } catch (err) {
-        if (err.message.includes("403")) {
+        if (err.message.includes("403") || err.message === ("Error al obtener usuarios")) {
           navigate("/no-access"); 
         } else {
           setError(err.message);

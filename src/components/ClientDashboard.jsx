@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext'; 
+//import { useNavigate } from 'react-router';
 import { fetchAllSubjects, createEnrollment, deleteEnrollment, fetchAllUsers, updateUser  } from '../services/api'; 
 import useEnrollments from '../hooks/useEnrollment'; 
 import "./ClientDashboard.css";
 
 const ClientDashboard = () => {
+    //const navigate = useNavigate();
     const { userId } = useAuth(); 
     const [subjects, setSubjects] = useState([]); 
     const [error, setError] = useState(null); 
@@ -70,6 +72,7 @@ const ClientDashboard = () => {
     useEffect(() => {
         fetchSubjects(); 
         fetchUserData(); 
+
     }, [userId]);
 
     const handleFormChange = (e) => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchStudentsAndSubjects, fetchSubjectsByProfessorId } from '../services/api'; 
-import { useAuth } from '../context/AuthContext'; // Importa el hook useAuth
+import { useAuth } from '../context/AuthContext'; 
 import "./ProfessorDashboard.css";
 
 const ProfessorDashboard = () => {
@@ -25,7 +25,7 @@ const ProfessorDashboard = () => {
             } catch (error) {
                 console.error('Error fetching students or subjects:', error);
                 
-                if (error.message.includes("403")) {
+                if (error.message === "Error al obtener los alumnos inscriptos" || error.message.includes("403")) {
                     navigate("/no-access"); 
                 } else {
                     setError('Error al obtener los alumnos inscriptos o las materias.'); 
@@ -34,12 +34,12 @@ const ProfessorDashboard = () => {
         };
 
         fetchData();
-    }, [userId, navigate]); // Dependencia de userId para volver a ejecutar si cambia
+    }, [userId, navigate]);  // Dependencia de userId para volver a ejecutar si cambia, si la saco queda en bucle haciendo banda de peticiones a la base 
 
     return (
         <div className="professor-dashboard">
             <h1>Dashboard del Profesor</h1>
-            {error && <p className="error-message">{error}</p>} {/* Muestra el mensaje de error si existe */}
+            {error && <p className="error-message">{error}</p>} 
             <h2>Alumnos Inscritos</h2>
             <ul>
                 {students.map(student => (
