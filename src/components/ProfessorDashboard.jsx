@@ -1,34 +1,40 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchStudentsAndSubjects, fetchSubjectsByProfessorId } from '../services/api'; 
 import { useAuth } from '../context/AuthContext'; // Importa el hook useAuth
 import "./ProfessorDashboard.css";
 
 const ProfessorDashboard = () => {
-    const { userId } = useAuth(); // Obtén el ID de usuario desde el contexto
+    const navigate = useNavigate();
+    const { userId } = useAuth(); 
     const [students, setStudents] = useState([]); 
     const [subjects, setSubjects] = useState([]); 
     const [error, setError] = useState(null); 
 
-    // Llama a la función para obtener estudiantes y materias al montar el componente
     useEffect(() => {
         const fetchData = async () => {
             setError(null); 
             try {
-                const studentsData = await fetchStudentsAndSubjects(userId); // Usa userId aquí
+                const studentsData = await fetchStudentsAndSubjects(userId); 
                 console.log(studentsData); 
                 setStudents(studentsData || []); 
 
-                const subjectsData = await fetchSubjectsByProfessorId(userId); // Usa userId aquí
+                const subjectsData = await fetchSubjectsByProfessorId(userId); 
                 console.log(subjectsData); 
                 setSubjects(subjectsData || []); 
             } catch (error) {
                 console.error('Error fetching students or subjects:', error);
-                setError('Error al obtener los alumnos inscriptos o las materias.'); 
+                
+                if (error.message.includes("403")) {
+                    navigate("/no-access"); 
+                } else {
+                    setError('Error al obtener los alumnos inscriptos o las materias.'); 
+                }
             }
         };
 
         fetchData();
-    }, [userId]); // Dependencia de userId para volver a ejecutar si cambia
+    }, [userId, navigate]); // Dependencia de userId para volver a ejecutar si cambia
 
     return (
         <div className="professor-dashboard">

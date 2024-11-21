@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   fetchAllUsers,
   fetchAllEnrollments,
@@ -10,11 +11,12 @@ import {
   updateSubject,
   deleteSubject,
   createEnrollment,
-  deleteEnrollment, // Asegúrate de importar la función deleteEnrollment
-} from "../services/api"; // Asegúrate de que estas funciones están correctamente definidas en api.js
+  deleteEnrollment, 
+} from "../services/api"; 
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [subjects, setSubjects] = useState([]);
@@ -22,7 +24,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [showSubjectForm, setShowSubjectForm] = useState(false);
-  const [showEnrollmentForm, setShowEnrollmentForm] = useState(false); // Estado para el formulario de inscripciones
+  const [showEnrollmentForm, setShowEnrollmentForm] = useState(false); 
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -51,19 +53,26 @@ const AdminDashboard = () => {
         const usersData = await fetchAllUsers();
         const enrollmentsData = await fetchAllEnrollments();
         const subjectsData = await fetchAllSubjects();
-        console.log("Datos de asignaturas:", subjectsData); // Verifica la estructura de los datos
+        
         setUsers(usersData);
         setEnrollments(enrollmentsData);
-        setSubjects(subjectsData); // Aquí se establece el estado de las asignaturas
+        setSubjects(subjectsData);
       } catch (err) {
-        setError(err.message);
+        if (err.message.includes("403")) {
+          navigate("/no-access"); 
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [navigate]);
+
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -105,7 +114,7 @@ const AdminDashboard = () => {
         role: formData.role,
       };
 
-      console.log("Datos a enviar:", dataToSubmit); // Verifica los datos aquí
+      console.log("Datos a enviar:", dataToSubmit); 
 
       if (formData.id) {
         await updateUser(formData.id, dataToSubmit);
@@ -126,7 +135,7 @@ const AdminDashboard = () => {
       });
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
-      alert(`Error al crear el usuario: ${error.message}`); // Muestra el mensaje de error al usuario
+      alert(`Error al crear el usuario: ${error.message}`); 
     }
   };
 
@@ -147,18 +156,18 @@ const AdminDashboard = () => {
       description: subject.description,
       professorId: subject.professorId,
     });
-    setShowSubjectForm(true); // Muestra el formulario para editar
+    setShowSubjectForm(true); 
   };
 
   const handleSubjectSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos de la asignatura antes de enviar:", subjectData); // Para depuración
+    console.log("Datos de la asignatura antes de enviar:", subjectData); 
     try {
       if (subjectData.id) {
-        console.log("Actualizando asignatura con ID:", subjectData.id); // Para depuración
+        console.log("Actualizando asignatura con ID:", subjectData.id); 
         await updateSubject(subjectData.id, subjectData);
       } else {
-        console.log("Creando nueva asignatura."); // Para depuración
+        console.log("Creando nueva asignatura."); 
         await createSubject(subjectData);
       }
 
@@ -173,11 +182,11 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteSubject = async (subjectId) => {
-    console.log("ID de la asignatura a eliminar:", subjectId); // Verifica el ID
+    console.log("ID de la asignatura a eliminar:", subjectId); 
 
     if (!subjectId) {
       console.error("El ID de la asignatura es inválido.");
-      return; // Salir si el ID es inválido
+      return; 
     }
 
     try {
@@ -192,7 +201,7 @@ const AdminDashboard = () => {
 
   const handleEnrollmentSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos de inscripción a enviar:", enrollmentData); // Agrega este log para verificar los datos
+    console.log("Datos de inscripción a enviar:", enrollmentData); 
     try {
       
       await createEnrollment(enrollmentData);
@@ -209,7 +218,7 @@ const AdminDashboard = () => {
   
 
   const handleDeleteEnrollment = async (enrollmentId) => {
-    console.log("ID de inscripción recibido para eliminación:", enrollmentId); // Verifica el ID
+    console.log("ID de inscripción recibido para eliminación:", enrollmentId); 
     if (!enrollmentId) {
       console.error("ID de inscripción no válido.");
       alert("No se puede eliminar la inscripción. ID no válido.");
@@ -300,7 +309,7 @@ const AdminDashboard = () => {
                     <div>
                         <button 
                             onClick={() => handleEdit(user)} 
-                            style={{ marginLeft: '20px' }} // Espacio entre el texto y el primer botón
+                            style={{ marginLeft: '20px' }} 
                         >
                             Editar
                         </button>
@@ -353,7 +362,7 @@ const AdminDashboard = () => {
                   <span>{enrollment.subjectTitle} <h3 style={{ display: 'inline', margin: '0' }}> - Legajo:</h3> {enrollment.clientId}</span>
                   <button 
                       onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)} 
-                      style={{ marginLeft: '20px' }} // Espacio entre el texto y el botón
+                      style={{ marginLeft: '20px' }} 
                   >
                       Eliminar
                   </button>
@@ -405,13 +414,13 @@ const AdminDashboard = () => {
                   <div>
                       <button 
                           onClick={() => handleDeleteSubject(subject.subjectId)} 
-                          style={{ marginLeft: '20px' }} // Espacio entre el texto y el botón
+                          style={{ marginLeft: '20px' }} 
                       >
                           Eliminar
                       </button>
                       <button 
                           onClick={() => handleEditSubject(subject)} 
-                          style={{ marginLeft: '10px' }} // Espacio entre los botones
+                          style={{ marginLeft: '10px' }} 
                       >
                           Editar
                       </button>

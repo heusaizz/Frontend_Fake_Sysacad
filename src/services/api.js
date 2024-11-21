@@ -37,6 +37,10 @@ export const fetchAllUsers = async () => {
       },
     });
 
+    if (response.status === 403) {
+      throw { message: "Error al obtener usuarios", status: 403 }; // Lanza un error 403
+    }
+
     if (!response.ok) {
       throw new Error("Error al obtener usuarios");
     }
@@ -45,7 +49,7 @@ export const fetchAllUsers = async () => {
     return data;
   } catch (error) {
     console.error(error);
-    throw error;
+    throw error; // Lanza el error para que pueda ser capturado en el dashboard
   }
 };
 
@@ -61,6 +65,10 @@ export const fetchAllEnrollments = async () => {
       },
     });
 
+    if (response.status === 403) {
+      throw new Error("403 - Forbidden"); // Lanza un error específico para 403
+    }
+
     if (!response.ok) {
       throw new Error("Error al obtener inscripciones");
     }
@@ -69,7 +77,7 @@ export const fetchAllEnrollments = async () => {
     return data;
   } catch (error) {
     console.error(error);
-    throw error;
+    throw error; // Lanza el error para que pueda ser capturado en el dashboard
   }
 };
 

@@ -9,25 +9,25 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('jwtToken');
-        const storedUserId = localStorage.getItem('userId'); // Obtener el ID de usuario del localStorage
+        const storedUserId = localStorage.getItem('userId'); 
         if (token) {
             setIsLoggedIn(true);
-            setUserId(storedUserId); // Establecer el ID de usuario si existe
+            setUserId(storedUserId); 
         }
     }, []);
 
     const login = (token, id) => {
         localStorage.setItem('jwtToken', token);
-        localStorage.setItem('userId', id); // Almacenar el ID de usuario
+        localStorage.setItem('userId', id); 
         setIsLoggedIn(true);
-        setUserId(id); // Establecer el ID de usuario en el estado
+        setUserId(id); 
     };
 
     const logout = () => {
         localStorage.removeItem('jwtToken');
-        localStorage.removeItem('userId'); // Eliminar el ID de usuario del localStorage
+        localStorage.removeItem('userId'); 
         setIsLoggedIn(false);
-        setUserId(null); // Restablecer el ID de usuario en el estado
+        setUserId(null); 
     };
 
     return (
